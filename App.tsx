@@ -7,7 +7,7 @@ import { ThemeProvider } from "./src/pages/preferencesMenu/themeContext";
 import StackRouter from "./src/routes/stackRoutes";
 
 export default function App(){
-    useEffect(() => {
+    useEffect(() => { 
         console.log("Fontes (devem estar) disponíveis!");
       }, []);
     return(
