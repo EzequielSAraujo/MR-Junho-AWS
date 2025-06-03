@@ -10,7 +10,7 @@ export default function App(){
     useEffect(() => { 
         console.log("Fontes (devem estar) disponíveis!");
       }, []);
-    return(
+    return( 
         <ThemeProvider>
             <NavigationContainer>
                 <StackRouter/>            
