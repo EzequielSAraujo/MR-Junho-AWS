@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text, View, Image, TextInput,
   KeyboardAvoidingView, TouchableOpacity,
@@ -17,7 +17,7 @@ export default function App() {
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [isCSenhaVisible, setIsCSenhaVisible] = useState(false); // Estado para alternar a visibilidade
+  const [isCSenhaVisible, setIsCSenhaVisible] = useState(false); 
   
 
   
@@ -27,45 +27,83 @@ export default function App() {
 
 
   const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Preencha todos os campos!");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      Alert.alert('Digite um e-mail válido');
-      return;
-    }
-    if (senha.length < 8){
-      Alert.alert('a senha precisa ter no minimo 8 caracteres')
-      return;
-    }
-  
-    try {
-      const storedUsers = await AsyncStorage.getItem('users');
-      const users = storedUsers ? JSON.parse(storedUsers) : [];
-  
-      const userFound = users.find(
-        (user) => user.email === email && user.senha === senha
-      );
-      
-     
+  if (!email || !senha) {
+    Alert.alert("Preencha todos os campos!");
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    Alert.alert('Digite um e-mail válido');
+    return;
+  }
+  if (senha.length < 8){
+    Alert.alert('A senha precisa ter no mínimo 8 caracteres');
+    return;
+  }
 
-      if (userFound) {
-        await AsyncStorage.setItem("loggedUserEmail", userFound.email); 
-        await AsyncStorage.setItem("loggedUserNome", userFound.nome); 
-        await AsyncStorage.setItem("loggedUserNumero", userFound.numero); 
-        navigation.navigate("Tab"); 
-        
-      } else {
-        Alert.alert("Email ou senha incorretos!");
-       
-      }
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      Alert.alert("Erro interno. Tente novamente.");
-    }
-  };
   
+
+  try {
+    const response = await fetch('http://18.219.117.124:3000/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: senha
+      }),
+    });
+    
+    const data = await response.json();
+
+    if (!response.ok) {
+      Alert.alert("Erro no login", data.message || "Email ou senha incorretos.");
+      return;
+    }
+
+  
+    const token = data.id_token || data.idToken; 
+
+    if (!token) {
+      Alert.alert("Erro", "Token de autenticação não recebido.");
+      return;
+    }
+
+    // ✅ Salvar corretamente no AsyncStorage
+    await AsyncStorage.setItem("id_token", token);
+    await AsyncStorage.setItem("refresh_token", data.refresh_token || data.refreshToken || '');
+
+    // Redirecionar para tela principal
+    navigation.navigate("Tab");
+
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    Alert.alert("Erro", "Erro interno ao tentar fazer login.");
+  }
+};
+  useEffect(() => {
+  const carregarPerfil = async () => {
+    const token = await AsyncStorage.getItem("id_token");
+
+    if (!token) {
+      Alert.alert("Erro", "Usuário não autenticado.");
+      return;
+    }
+
+    const response = await fetch("http://18.219.117.124:3000/profile", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+    console.log("Dados do perfil:", data);
+  };
+
+  carregarPerfil();
+}, []);
+
   return (
     <KeyboardAvoidingView style={styles.background}>
       <View style={styles.containerLogo}>

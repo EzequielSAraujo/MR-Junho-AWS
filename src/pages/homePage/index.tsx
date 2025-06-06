@@ -86,6 +86,7 @@ export default function HomeScreen() {
             </View>
         );
     }
+    
 
     return (
         <>
