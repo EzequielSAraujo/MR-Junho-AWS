@@ -6,27 +6,17 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
 import { useNavigation } from '@react-navigation/native';
-
 import { styles } from './style';
 
-
 export default function App() {
-
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [isCSenhaVisible, setIsCSenhaVisible] = useState(false); 
-  
-
-  
+  const [isCSenhaVisible, setIsCSenhaVisible] = useState(false);   
   const navigation = useNavigation();
-
   const [rememberMe, setRememberMe] = useState(false);
 
-
-  const handleLogin = async () => {
+const handleLogin = async () => {
   if (!email || !senha) {
     Alert.alert("Preencha todos os campos!");
     return;
@@ -35,25 +25,18 @@ export default function App() {
     Alert.alert('Digite um e-mail válido');
     return;
   }
-  if (senha.length < 8){
+  if (senha.length < 8) {
     Alert.alert('A senha precisa ter no mínimo 8 caracteres');
     return;
   }
 
-  
-
   try {
     const response = await fetch('http://18.219.117.124:3000/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        password: senha
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: senha })
     });
-    
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -61,19 +44,25 @@ export default function App() {
       return;
     }
 
-  
-    const token = data.id_token || data.idToken; 
-
+    const token = data.id_token || data.authToken || data.idToken;
     if (!token) {
       Alert.alert("Erro", "Token de autenticação não recebido.");
       return;
-    }
+    }  
 
-    // ✅ Salvar corretamente no AsyncStorage
-    await AsyncStorage.setItem("id_token", token);
+    await AsyncStorage.setItem("authToken", token);
     await AsyncStorage.setItem("refresh_token", data.refresh_token || data.refreshToken || '');
+    await AsyncStorage.setItem("loggedUserEmail", email);
 
-    // Redirecionar para tela principal
+    const profileResponse = await fetch("http://18.219.117.124:3000/profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const profileData = await profileResponse.json();
+    await AsyncStorage.setItem("loggedUserPicture", profileData.picture || '');
     navigation.navigate("Tab");
 
   } catch (error) {
@@ -81,28 +70,10 @@ export default function App() {
     Alert.alert("Erro", "Erro interno ao tentar fazer login.");
   }
 };
-  useEffect(() => {
-  const carregarPerfil = async () => {
-    const token = await AsyncStorage.getItem("id_token");
 
-    if (!token) {
-      Alert.alert("Erro", "Usuário não autenticado.");
-      return;
-    }
 
-    const response = await fetch("http://18.219.117.124:3000/profile", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+  
 
-    const data = await response.json();
-    console.log("Dados do perfil:", data);
-  };
-
-  carregarPerfil();
-}, []);
 
   return (
     <KeyboardAvoidingView style={styles.background}>

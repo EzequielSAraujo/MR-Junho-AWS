@@ -90,14 +90,23 @@ export default function SingUp() {
       }),
     });
 
-    const data = await response.json();
+    let data;
+const contentType = response.headers.get("content-type");
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Erro ao registrar usuário');
-    }
+if (contentType && contentType.includes("application/json")) {
+  data = await response.json();
+} else {
+  const text = await response.text();
+  console.log("Erro texto da API:", text);
+  throw new Error(text || "Erro inesperado do servidor.");
+}
 
-    // Salvando os dados que vêm da API
-    await AsyncStorage.setItem("idToken", data.idToken);
+if (!response.ok) {
+  console.log("Erro JSON da API:", data);
+  throw new Error(data.message || "Erro ao registrar usuário");
+}
+
+    await AsyncStorage.setItem("authToken", data.idToken);
     await AsyncStorage.setItem("uid", data.uid);
     await AsyncStorage.setItem("loggedUserEmail", email);
     await AsyncStorage.setItem("loggedUserNome", nome);

@@ -17,27 +17,32 @@ export default function ModalCriarTarefa({ visible, onClose, onCreate }) {
   const { theme } = useTheme();
 
   const handleCreate = () => {
-    if (!titulo.trim() || !descricao.trim() || !prazo.trim()) {
-      alert('Preencha todos os campos!');
-      return;
-    }
-    if (prazo.length !== 10) {
-      alert('Por favor, insira uma data de prazo válida no formato XX/XX/XXXX.');
-      return;
-    }
+  if (!titulo.trim() || !descricao.trim() || !prazo.trim()) {
+    alert('Preencha todos os campos!');
+    return;
+  }
+  if (prazo.length !== 10) {
+    alert('Por favor, insira uma data de prazo válida no formato XX/XX/XXXX.');
+    return;
+  }
 
-    const novaTarefa = {
-      titulo,
-      descricao,
-      prazo,
-    };
-
-    onCreate(novaTarefa);
-    setTitulo('');
-    setDescricao('');
-    setPrazo('');
-    onClose();
+  const novaTarefa = {
+    title: titulo.trim(),
+    description: descricao.trim(),
+    deadline: prazo.trim(),
+    done: false,
+    priority: 3,
+    subtasks: [],
+    tags: []
   };
+
+  onCreate(novaTarefa);
+  setTitulo('');
+  setDescricao('');
+  setPrazo('');
+  onClose();
+};
+
 
   const formatarData = (text) => {
     const numeros = text.replace(/\D/g, '');

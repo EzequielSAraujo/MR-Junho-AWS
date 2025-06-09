@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import styles from './style';
-import AvatarImage from '../../assets/imgs/avatar.png';
+import AvatarImage from '../../assets/imgs/Ellipse1.png';
+import AvatarImage2 from '../../assets/imgs/Ellipse2.png';
+import AvatarImage3 from '../../assets/imgs/Ellipse3.png';
+import AvatarImage4 from '../../assets/imgs/Ellipse4.png';
+import AvatarImage5 from '../../assets/imgs/Ellipse5.png';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,10 +20,10 @@ const AvatarSelectionScreen: React.FC = () => {
 
         const avatars: Avatar[] = [
                 {id: 1, imageUrl: AvatarImage, borderColor: '#5B3CC4'},
-                {id: 2, imageUrl: AvatarImage, borderColor: '#E6E0F7'},
-                {id: 3, imageUrl: AvatarImage, borderColor: '#32C25B'},
-                {id: 4, imageUrl: AvatarImage, borderColor: '#E63946'},
-                {id: 5, imageUrl: AvatarImage, borderColor: '#B58B46'},
+                {id: 2, imageUrl: AvatarImage2, borderColor: '#E6E0F7'},
+                {id: 3, imageUrl: AvatarImage3, borderColor: '#32C25B'},
+                {id: 4, imageUrl: AvatarImage4, borderColor: '#E63946'},
+                {id: 5, imageUrl: AvatarImage5, borderColor: '#B58B46'},
         ];
 
         const handleAvatarPress = (id: number) => {
@@ -29,7 +33,8 @@ const AvatarSelectionScreen: React.FC = () => {
         const handleConfirmSelection = () => {
                 if (selectedAvatarId) {
                         console.log('Avatar selecionado: ', selectedAvatarId);
-                        navigation.navigate("Tab");
+                        Alert.alert("Conta criada com sucesso")
+                        navigation.navigate("SingIn");
                 }
         }
 

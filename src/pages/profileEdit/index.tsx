@@ -38,9 +38,9 @@ const ProfileEdit: React.FC = () => {
 const handleContinueButton = async () => {
   if (isEmailValid(email) && isFullnameValid(fullName) && isPhoneNumberValid(phoneNumber)) {
     try {
-      const id_token = await AsyncStorage.getItem("id_token");
+      const token = await AsyncStorage.getItem("authToken");
 
-      if (!id_token) {
+      if (!token) {
         Alert.alert("Erro", "Usuário não autenticado.");
         return;
       }
@@ -49,7 +49,7 @@ const handleContinueButton = async () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${id_token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           name: fullName,
@@ -85,9 +85,9 @@ const handleContinueButton = async () => {
   useEffect(() => {
   const carregarPerfil = async () => {
     try {
-      const id_token = await AsyncStorage.getItem("id_token");
+      const token = await AsyncStorage.getItem("authToken");
 
-      if (!id_token) {
+      if (!token) {
         Alert.alert("Erro", "Usuário não autenticado.");
         return;
       }
@@ -95,7 +95,7 @@ const handleContinueButton = async () => {
       const response = await fetch('http://18.219.117.124:3000/profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${id_token}`
+          'Authorization': `Bearer ${token}`
         }
       });
 

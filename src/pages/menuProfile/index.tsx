@@ -21,6 +21,19 @@ import ProfileImage from '../../assets/imgs/avatar.png';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const getProfileImage = (pictureId: string) => {
+  switch (pictureId) {
+    case 'avatar_1': return require('../../assets/imgs/Ellipse1.png');
+    case 'avatar_2': return require('../../assets/imgs/Ellipse2.png');
+    case 'avatar_3': return require('../../assets/imgs/Ellipse3.png');
+    case 'avatar_4': return require('../../assets/imgs/Ellipse4.png');
+    case 'avatar_5': return require('../../assets/imgs/Ellipse5.png');
+    default: return require('../../assets/imgs/avatar.png');
+  }
+};
+
+
+
 const formatPhoneNumber = (phoneNumber: string) => {
   if (!phoneNumber) {
     return '';
@@ -41,7 +54,7 @@ const ProfileScreen: React.FC = () => {
   const [isBiometricModalVisible, setIsBiometricModalVisible] = useState(false);
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
   const [isAccountDeletionModalVisible, setIsAccountDeletionModalVisible] = useState(false);
-  const [usuario, setUsuario] = useState({ nome: '', email: '', numero: '' });
+  const [usuario, setUsuario] = useState({ nome: '', email: '', numero: '',picture:'' });
 
 
   const getIcon = (iconName: string) => {
@@ -119,9 +132,9 @@ const ProfileScreen: React.FC = () => {
 
   const handleConfirmDeleteAccount = async () => {
   try {
-    const id_token = await AsyncStorage.getItem("id_token");
+    const token = await AsyncStorage.getItem("authToken");
 
-    if (!id_token) {
+    if (!token) {
       Alert.alert("Erro", "Você não está autenticado.");
       return;
     }
@@ -129,7 +142,7 @@ const ProfileScreen: React.FC = () => {
     const response = await fetch("http://18.219.117.124:3000/profile/delete-account", {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${id_token}`,
+        Authorization: `Bearer ${token}`,
       }
     });
 
@@ -159,15 +172,14 @@ const ProfileScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {      
       const carregarUsuario = async () => {
-      const id_token = await AsyncStorage.getItem("id_token");
+      const token = await AsyncStorage.getItem("authToken");
 
-      if (!id_token) {
+      if (!token) {
         Alert.alert("Erro", "Usuário não autenticado.");
         return;
       }
 
       try {
-  const token = await AsyncStorage.getItem("id_token");
   console.log("🧪 TOKEN LIDO DO STORAGE:", token);
 
   if (!token) {
@@ -176,24 +188,34 @@ const ProfileScreen: React.FC = () => {
   }
 
   const response = await fetch("http://18.219.117.124:3000/profile", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
-  if (!response.ok) {
-    console.error("Erro ao buscar perfil:", await response.text());
-    Alert.alert("Erro", "Não foi possível carregar os dados.");
-    return;
-  }
+if (!response.ok) {
+  const text = await response.text();
+  console.error("Erro ao buscar perfil:", text);
+  Alert.alert("Erro", "Não foi possível carregar os dados.");
+  return;
+}
 
-  const data = await response.json();
-  setUsuario({
-    nome: data.name,
-    email: data.email,
-    numero: data.phone_number,
-  });
+const data = await response.json();
+
+// Verificação defensiva
+if (!data?.name || !data?.email || !data?.phone_number) {
+  console.error("Resposta inesperada do backend:", data);
+  Alert.alert("Erro", "Dados incompletos recebidos.");
+  return;
+}
+
+setUsuario({
+  nome: data.name,
+  email: data.email,
+  numero: data.phone_number,
+  picture: data.picture,
+});
 } catch (error) {
   console.error("Erro ao buscar dados do usuário:", error);
   Alert.alert("Erro interno", "Falha ao carregar dados.");
@@ -213,7 +235,7 @@ const ProfileScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image source={ProfileImage} style={styles.avatar} />
+          <Image source={getProfileImage(usuario.picture || '')} style={styles.avatar} />
         </View>
         <Text style={styles.name}>{usuario.nome}</Text>
         <Text style={styles.email}>{usuario.email}</Text>
