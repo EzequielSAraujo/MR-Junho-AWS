@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../pages/preferencesMenu/themeContext';
-import getStyles from './style'; // Importe a função que retorna os estilos
+import getStyles from './style';
 
 export default function PreferencesMenu() {
   const navigation = useNavigation();
-  const { theme, setTheme, currentThemeName } = useTheme(); // Agora pegamos o tema diretamente do contexto
+  const { theme, setTheme, currentThemeName } = useTheme(); 
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>(currentThemeName); // Inicializa com o tema atual
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>(currentThemeName); 
   const themeText = currentThemeName === 'dark' ? 'Habilitar Tema Claro' : 'Habilitar Tema Escuro';
-  const styles = getStyles(theme); // Passamos o objeto 'theme' (com as cores) para a função de estilos
+  const styles = getStyles(theme); 
 
   const handleConfirmTheme = () => {
     if (selectedTheme !== currentThemeName) {
@@ -21,7 +21,6 @@ export default function PreferencesMenu() {
 
   return (
     <View style={styles.container}>
-      {/* Topo com botão voltar e título */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backText}> ＜  VOLTAR</Text>
@@ -29,7 +28,6 @@ export default function PreferencesMenu() {
         <Text style={styles.headerTitle}>Preferências</Text>
       </View>
 
-      {/* Card de tema */}
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <View style={styles.button}>
           <Text style={styles.cardText}>{themeText}</Text>
@@ -37,7 +35,6 @@ export default function PreferencesMenu() {
         </View>
       </TouchableOpacity>
 
-      {/* Modal de escolha de tema */}
       <Modal
         animationType="fade"
         transparent={true}
