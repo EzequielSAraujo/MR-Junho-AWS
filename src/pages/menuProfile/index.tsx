@@ -21,14 +21,14 @@ import ProfileImage from '../../assets/imgs/avatar.png';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getProfileImage = (pictureId: string) => {
+    const getProfileImage = (pictureId: string | null): string => {
   switch (pictureId) {
-    case 'avatar_1': return require('../../assets/imgs/Ellipse1.png');
-    case 'avatar_2': return require('../../assets/imgs/Ellipse2.png');
-    case 'avatar_3': return require('../../assets/imgs/Ellipse3.png');
-    case 'avatar_4': return require('../../assets/imgs/Ellipse4.png');
-    case 'avatar_5': return require('../../assets/imgs/Ellipse5.png');
-    default: return require('../../assets/imgs/avatar.png');
+    case 'avatar_1': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%201.png';
+    case 'avatar_2': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%202.png';
+    case 'avatar_3': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%203.png';
+    case 'avatar_4': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%204.png';
+    case 'avatar_5': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%205.png';
+    default: return Image.resolveAssetSource(require('../../assets/imgs/avatar.png')).uri;
   }
 };
 
@@ -235,7 +235,10 @@ setUsuario({
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image source={getProfileImage(usuario.picture || '')} style={styles.avatar} />
+          <Image
+            source={{ uri: getProfileImage(usuario.picture || '') }}
+            style={styles.avatar}
+          />
         </View>
         <Text style={styles.name}>{usuario.nome}</Text>
         <Text style={styles.email}>{usuario.email}</Text>

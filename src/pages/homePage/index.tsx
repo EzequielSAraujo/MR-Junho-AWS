@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import createStyles from './style';
@@ -7,7 +7,9 @@ import ModalCriarTarefa from '../../components/common/modalcriartarefa';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../pages/preferencesMenu/themeContext';
 
+
 export default function HomeScreen() {
+  const navigation = useNavigation();
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const [userEmail, setUserEmail] = useState('');
@@ -18,16 +20,17 @@ export default function HomeScreen() {
     const [userAvatar, setUserAvatar] = useState('');
 
 
-    const getProfileImage = (pictureId: string | null) => {
+    const getProfileImage = (pictureId: string | null): string => {
   switch (pictureId) {
-    case 'avatar_1': return require('../../assets/imgs/Ellipse1.png');
-    case 'avatar_2': return require('../../assets/imgs/Ellipse2.png');
-    case 'avatar_3': return require('../../assets/imgs/Ellipse3.png');
-    case 'avatar_4': return require('../../assets/imgs/Ellipse4.png');
-    case 'avatar_5': return require('../../assets/imgs/Ellipse5.png');
-    default: return require('../../assets/imgs/avatar.png');
+    case 'avatar_1': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%201.png';
+    case 'avatar_2': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%202.png';
+    case 'avatar_3': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%203.png';
+    case 'avatar_4': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%204.png';
+    case 'avatar_5': return 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%205.png';
+    default: return Image.resolveAssetSource(require('../../assets/imgs/avatar.png')).uri;
   }
 };
+
 
     const salvarTarefas = async (dados, email) => {
         if (!email) return;
@@ -183,8 +186,8 @@ export default function HomeScreen() {
                 <View style={styles.header}>
                     <Text style={styles.title}>TASKLY</Text>
                     <Image
-                        source={getProfileImage(userAvatar)}
-                        style={styles.logo3}
+                      source={{ uri: getProfileImage(userAvatar) }}
+                      style={styles.logo3}
                     />
                 </View>
                 <View style={styles.content}>
@@ -211,7 +214,8 @@ export default function HomeScreen() {
                                     </View>
                                     <Text style={[styles.txtp, tarefa.done && styles.taskCompletedText]}>{tarefa.description}</Text>
 
-                                    <TouchableOpacity style={styles.btn}>
+                                    <TouchableOpacity style={styles.btn}onPress={() => navigation.navigate("avatarSelect")}>
+                                      
                                         <Text style={styles.txtbtn}>VER DETALHES</Text>
                                     </TouchableOpacity>
                                 </View>

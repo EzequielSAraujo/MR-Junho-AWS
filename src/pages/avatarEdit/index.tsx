@@ -5,18 +5,12 @@ import { useTheme } from '../../pages/preferencesMenu/themeContext';
 import getStyles from './style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import AvatarImage from '../../assets/imgs/Ellipse1.png';
-import AvatarImage2 from '../../assets/imgs/Ellipse2.png';
-import AvatarImage3 from '../../assets/imgs/Ellipse3.png';
-import AvatarImage4 from '../../assets/imgs/Ellipse4.png';
-import AvatarImage5 from '../../assets/imgs/Ellipse5.png';
-
 import ChevronLeftIcon from '../../assets/icons/ChevronLeft.png';
 import ConfirmEditModal from '../../components/common/ConfirmEditModal';
 
 interface Avatar {
   id: number;
-  imageUrl: any;
+  imageUrl: string;
   borderColor: string;
 }
 
@@ -28,11 +22,11 @@ const AvatarSelectionScreen: React.FC = () => {
   const styles = getStyles(theme);
 
   const avatars: Avatar[] = [
-    { id: 1, imageUrl: AvatarImage, borderColor: theme.primary },
-    { id: 2, imageUrl: AvatarImage2, borderColor: theme.primaryLight },
-    { id: 3, imageUrl: AvatarImage3, borderColor: theme.secondaryAccent },
-    { id: 4, imageUrl: AvatarImage4, borderColor: theme.error },
-    { id: 5, imageUrl: AvatarImage5, borderColor: '#B58B46' },
+    { id: 1, imageUrl: 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%201.png', borderColor: theme.primary },
+    { id: 2, imageUrl: 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%202.png', borderColor: theme.primaryLight },
+    { id: 3, imageUrl: 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%203.png', borderColor: theme.secondaryAccent },
+    { id: 4, imageUrl: 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%204.png', borderColor: theme.error },
+    { id: 5, imageUrl: 'https://img-teskly.s3.us-east-2.amazonaws.com/img/Ellipse%205.png', borderColor: '#B58B46' },
   ];
 
   const getAvatarPictureId = (id: number) => `avatar_${id}`;
@@ -114,16 +108,28 @@ const AvatarSelectionScreen: React.FC = () => {
         {avatars.map((avatar) => (
           <TouchableOpacity
             key={avatar.id}
-            style={[styles.avatarButton, { borderColor: avatar.borderColor }]}
+            style={[
+              styles.avatarButton,
+              {
+                borderColor: avatar.borderColor,
+                borderWidth: selectedAvatarId === avatar.id ? 3 : 1,
+                backgroundColor: selectedAvatarId === avatar.id ? '#eee' : 'transparent',
+              },
+            ]}
             onPress={() => handleAvatarPress(avatar.id)}
           >
             <Image
-              source={avatar.imageUrl}
+              source={{ uri: avatar.imageUrl }}
               style={[
                 styles.avatarImage,
                 selectedAvatarId !== avatar.id && styles.deselectedAvatarImage,
               ]}
             />
+            {selectedAvatarId === avatar.id && (
+              <View style={styles.checkOverlay}>
+                <Text style={styles.checkMark}>✓</Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
       </View>
